@@ -9,13 +9,13 @@
     "rollup",
     "transform"
   ],
-  "homepage": "https://github.com/antfu/unplugin-starter#readme",
+  "homepage": "https://github.com/zenotsai/unplugin-upload-cdn",
   "bugs": {
-    "url": "https://github.com/antfu/unplugin-starter/issues"
+    "url": "https://github.com/zenotsai/unplugin-upload-cdn/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/antfu/unplugin-starter.git"
+    "url": "git+https://github.com/zenotsai/unplugin-upload-cdn.git"
   },
   "license": "MIT",
   "exports": {
