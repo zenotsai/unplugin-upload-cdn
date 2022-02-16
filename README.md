@@ -2,7 +2,7 @@
 
 [![NPM version](https://img.shields.io/npm/v/unplugin-starter?color=a1b858&label=)](https://github.com/zenotsai/unplugin-upload-cdn)
 
-Upload resource files to cdn. Powered by unplugin.
+Upload resource files to cdn. Powered by [unplugin](https://github.com/unjs/unplugin).
 
 # Install
 ```bash
