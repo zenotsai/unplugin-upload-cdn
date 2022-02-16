@@ -1,24 +1,27 @@
-import { ReadStream } from 'fs'
+import { ReadStream, Stats } from 'fs'
 export interface IFile {
   path: string
   content: ReadStream
+  stat: Stats
+  key: string
+}
+
+export interface IResource {
+  path: string
+  key: string
 }
 
 export interface IProvider {
   upload: (file: IFile) => void
-  beforeUpload: (files: string[]) => Promise<string[]>
+  beforeUpload: (files: IResource[], existCheck?: boolean) => Promise<IResource[]>
 }
 
-export interface IBaseOptions {
-  dir: string
-  retry?: number
-  existCheck: boolean
-  ignoreError?: boolean
-  gzip?: boolean
-  provider: IProvider
-  ignore?: string[]
-}
-
-export interface Options extends IBaseOptions {
+export interface IOptions {
   // define your plugin options here
+  existCheck?: boolean
+  dir: string
+  ignore?: string[]
+  provider: IProvider
+  useVersion?: boolean
+  prefix?: string
 }

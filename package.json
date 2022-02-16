@@ -1,13 +1,16 @@
 {
   "name": "unplugin-upload-cdn",
-  "version": "0.2.0",
-  "description": "Register global imports on demand for Vite and Webpack",
+  "version": "0.1.0",
+  "description": "Plugin for uploading resource files to cdn,  Powered by on unplugin",
   "keywords": [
     "unplugin",
     "vite",
     "webpack",
     "rollup",
-    "transform"
+    "cdn",
+    "upload",
+    "cos",
+    "oss"
   ],
   "homepage": "https://github.com/zenotsai/unplugin-upload-cdn",
   "bugs": {

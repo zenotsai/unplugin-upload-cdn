@@ -1,58 +1,65 @@
+import path from 'path'
 import { createUnplugin } from 'unplugin'
 import fs from 'fs-extra'
 import pLimit from 'p-limit'
 import globby from 'globby'
-import { Options } from './types'
+import { log, NpmUtils } from './utils'
 
-export { default as COS } from './provider/cos'
+import { IOptions, IResource } from './types'
 
-// function getFileContentBuffer(file: IFile, gzipVal: number) {
-//   const gzip = !!(typeof gzipVal === 'number' || gzipVal === true)
-//   const opts = typeof gzipVal === 'number' ? { level: gzipVal } : {}
-//   if (!gzip) {
-//     return Promise.resolve(
-//       Buffer.isBuffer(file.content) ? file.content : Buffer.from(file.content),
-//     )
-//   }
-//   return new Promise((resolve, reject) => {
-//     zlib.gzip(
-//       Buffer.isBuffer(file.content) ? file.content : Buffer.from(file.content),
-//       opts,
-//       (err, gzipBuffer) => {
-//         if (err) reject(err)
-//         resolve(gzipBuffer)
-//       },
-//     )
-//   })
-// }
+export { default as COS } from './cos'
+export { default as OSS } from './oss'
 
 const limit = pLimit(500)
 
-export default createUnplugin<Options>(options => ({
-  name: 'unplugin-starter',
-  buildEnd: async (error: Error) => {
+function getFileKey(prefix: string, filePath: string, useVersion?: boolean) {
+  const npmUtils = new NpmUtils()
+  const base = prefix || npmUtils.getProjectName()
+  if (useVersion) {
+    const version = npmUtils.getVersion()
+    if (version)
+      return path.join(base, version, filePath)
+  }
+
+  return path.join(base, filePath)
+}
+
+export const unpluginUploadCDN = createUnplugin<IOptions>(options => ({
+  name: 'unplugin-upload-cdn',
+  buildEnd: async () => {
     if (!options)
       throw new Error('missing configuration')
 
-    if (error)
-      throw error
-
-    const { dir, provider, ignore = [] } = options
-    let paths: string[] = await globby(dir, {
+    const {
+      dir,
+      provider,
+      ignore = [],
+      useVersion = Boolean(process.env.CDN_PLUGIN_USE_VERSION),
+      prefix = '',
+      existCheck = Boolean(process.env.CDN_PLUGIN_EXIST_CHECK),
+    } = options
+    const paths: string[] = await globby(dir, {
       ignore: ['*', ...ignore],
     })
+    let resList: IResource[] = paths.map(filePath => ({
+      path: filePath,
+      key: getFileKey(prefix, filePath, useVersion),
+    }))
 
-    paths = await provider.beforeUpload(paths)
+    resList = await provider.beforeUpload(resList, existCheck)
 
-    const files = paths.map((file) => {
+    const files = resList.map((res) => {
       return {
-        path: file,
-        content: fs.createReadStream(file),
+        path: res.path,
+        key: res.key,
+        stat: fs.statSync(res.path),
+        content: fs.createReadStream(res.path),
       }
     })
-
+    log('Start uploading...')
     await Promise.all(files.map((file) => {
       return limit(() => provider.upload(file))
     }))
+    log('======= End =========')
   },
 }))

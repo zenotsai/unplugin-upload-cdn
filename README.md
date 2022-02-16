@@ -1,40 +1,96 @@
-# unplugin-starter
+# unplugin-upload-cdn
 
-[![NPM version](https://img.shields.io/npm/v/unplugin-starter?color=a1b858&label=)](https://www.npmjs.com/package/unplugin-starter)
+[![NPM version](https://img.shields.io/npm/v/unplugin-starter?color=a1b858&label=)](https://github.com/zenotsai/unplugin-upload-cdn)
 
-Starter template for [unplugin](https://github.com/unjs/unplugin).
+Upload resource files to cdn. Powered by unplugin.
 
-## Template Usage
-
-To use this template, clone it down using:
-
+# Install
 ```bash
-npx degit antfu/unplugin-starter my-unplugin
+npm i unplugin-upload-cdn
 ```
 
-And do a global replace of `unplugin-starter` with your plugin name.
 
-Then you can start developing your unplugin 🔥
+# Provider
+Support Tencent cos, Alibaba oss
 
-To test your plugin, run: `pnpm run dev`
-To release a new version, run: `pnpm run release`
+[COS Document](https://cloud.tencent.com/document/product/436/8629)
+[OSS Document](https://help.aliyun.com/document_detail/111256.html)
+```js
+import { unpluginUploadCDN, COS, OSS } from "unplugin-upload-cdn";
 
-## Install
+const cos = new COS({ /* options */ });
+const oss = new OSS({ /* options */ });
 
-```bash
-npm i unplugin-starter
+import { unpluginUploadCDN, COS } from "unplugin-upload-cdn";
+
+export default defineConfig({
+  plugins: [
+    unpluginUploadCDN.vite({
+     /* options */
+     provider: cos // oss,
+    }),
+  ],
+})
 ```
+The parameters of the environment variables are read by default
+
+OSS
+```js
+{
+  accessKeyId: process.env.CDN_PLUGIN_ACCESSKEY_ID,
+  accessKeySecret: process.env.CDN_PLUGIN_SECRET,
+  bucket: process.env.CDN_PLUGIN_BUCKET,
+  region: process.env.CDN_PLUGIN_REGION,
+}
+```
+
+COS
+```js
+{
+  SecretId: process.env.CDN_PLUGIN_SECRET_ID,
+  SecretKey: process.env.CDN_PLUGIN_SECRET_KEY,
+  Bucket: process.env.CDN_PLUGIN_BUCKET,
+  Region: process.env.CDN_PLUGIN_REGION,
+}
+```
+
+## Custom
+implements IProvider 
+```ts
+export interface IProvider {
+  upload: (file: IFile) => void
+  beforeUpload: (files: IResource[], existCheck?: boolean) => Promise<IResource[]>
+}
+```
+
+
+Name | Environment Variables | Default | Description |
+---  | --- | --- | --- |
+ignore | `CDN_PLUGIN_IGNORE` | [] | ignore uploaded files, e.g. ["**/*.html"] |
+dir |  | null | Uploaded directory |
+existCheck | `CDN_PLUGIN_EXISTCHECK` | null | check if the file has been uploaded, judged by the file name |
+prefix | null | package.json.name | prefix |
+useVersion | `CDN_PLUGIN_USE_VERSION` | false | splice the version of package.json as a prefix |
+provider | - | null | - |
+
+
+# Options
+
+
+<br></details>
 
 <details>
 <summary>Vite</summary><br>
 
 ```ts
 // vite.config.ts
-import Starter from 'unplugin-starter/vite'
+import { unpluginUploadCDN, COS } from "unplugin-upload-cdn";
 
 export default defineConfig({
   plugins: [
-    Starter({ /* options */ }),
+    unpluginUploadCDN.vite({
+     /* options */
+    }),
   ],
 })
 ```
@@ -48,11 +104,13 @@ Example: [`playground/`](./playground/)
 
 ```ts
 // rollup.config.js
-import Starter from 'unplugin-starter/rollup'
+import { unpluginUploadCDN, COS } from "unplugin-upload-cdn";
 
 export default {
   plugins: [
-    Starter({ /* options */ }),
+     unpluginUploadCDN.rollup({
+      /* options */
+    }),
   ],
 }
 ```
@@ -64,45 +122,20 @@ export default {
 <summary>Webpack</summary><br>
 
 ```ts
+
+const { unpluginUploadCDN, COS } = require("unplugin-upload-cdn");
+
 // webpack.config.js
 module.exports = {
   /* ... */
   plugins: [
-    require('unplugin-starter/webpack')({ /* options */ })
+    unpluginUploadCDN.webpack({
+      /* options */
+    }),
   ]
 }
 ```
 
 <br></details>
 
-<details>
-<summary>Nuxt</summary><br>
 
-```ts
-// nuxt.config.js
-export default {
-  buildModules: [
-    ['unplugin-starter/nuxt', { /* options */ }],
-  ],
-}
-```
-
-> This module works for both Nuxt 2 and [Nuxt Vite](https://github.com/nuxt/vite)
-
-<br></details>
-
-<details>
-<summary>Vue CLI</summary><br>
-
-```ts
-// vue.config.js
-module.exports = {
-  configureWebpack: {
-    plugins: [
-      require('unplugin-starter/webpack')({ /* options */ }),
-    ],
-  },
-}
-```
-
-<br></details>

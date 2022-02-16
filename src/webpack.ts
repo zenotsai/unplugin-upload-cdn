@@ -1,3 +1,3 @@
-import unplugin from '.'
+import { unpluginUploadCDN } from '.'
 
-export default unplugin.webpack
+export default unpluginUploadCDN.webpack
