@@ -1,4 +1,3 @@
-import * as path from 'path'
 import COS, { COSOptions } from 'cos-nodejs-sdk-v5'
 import filesize from 'filesize'
 import chalk from 'chalk'
@@ -8,6 +7,8 @@ import { log } from './utils'
 import { IProvider, IResource, IFile } from './types'
 
 interface ICOSConfig extends COSOptions {
+  Bucket: string
+  Region: string
 }
 
 class COSProvider implements IProvider {

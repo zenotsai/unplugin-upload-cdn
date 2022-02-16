@@ -1,7 +1,7 @@
-import { Options } from './types'
+import { IOptions } from './types'
 import { unpluginUploadCDN } from '.'
 
-export default function (this: any, options: Options) {
+export default function (this: any, options: IOptions) {
   // install webpack plugin
   this.extendBuild((config: any) => {
     config.plugins = config.plugins || []
